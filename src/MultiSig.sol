@@ -27,6 +27,7 @@ contract MultiSigWallet {
         uint256 _value,
         bytes _data
     );
+    event ConfirmTransaction(address indexed _owner, uint256 _index);
 
     struct Transaction {
         address to;
@@ -103,6 +104,7 @@ contract MultiSigWallet {
         Transaction memory _transaction = transactions[_index];
         transactionIsConfirmed[_index][msg.sender] = true;
         _transaction.numOfConfirmation += 1;
+        emit ConfirmTransaction(msg.sender, _index);
     }
     //executeTransaction
     function executeTransaction(uint256 _index) external returns (bool) {
