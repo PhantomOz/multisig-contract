@@ -27,7 +27,8 @@ contract MultiSigWallet {
         uint256 _value,
         bytes _data
     );
-    event ConfirmTransaction(address indexed _owner, uint256 _index);
+    event ConfirmTransaction(address indexed _owner, uint256 indexed _index);
+    event ExecuteTransaction(address indexed _owner, uint256 indexed _index);
 
     struct Transaction {
         address to;
@@ -119,6 +120,7 @@ contract MultiSigWallet {
         if (!s) {
             revert TRANSACTION_FAILED();
         }
+        emit ExecuteTransaction(msg.sender, _index);
         return s;
     }
     //RevokeTransaction
