@@ -5,6 +5,12 @@ error OWNERSLIST_CANT_BE_EMPTY();
 error NO_CONFIRMATION_MUST_BE_IN_RANGE_WITH_LIST();
 error ADDRESS_CANT_BE_ZEROADDRESS();
 error ADDRESSES_ON_LIST_NOT_UNIQUE();
+error NOT_OWNER();
+error INDEX_OUT_OF_BOUNDS();
+error ALREADY_EXECUTED();
+error ALREADY_CONFIRMED();
+error ALREADY_REVOKED();
+error TRANSACTION_FAILED();
 
 contract MultiSigWallet {
     address[] private owners;
@@ -51,15 +57,15 @@ contract MultiSigWallet {
     //Private functions as modifiers
     function onlyOwnerAndTxExists(uint256 _index) private view {
         if (!addressIsOwner[msg.sender]) {
-            revert();
+            revert NOT_OWNER();
         }
         if (_index >= transactions.length) {
-            revert();
+            revert INDEX_OUT_OF_BOUNDS();
         }
     }
     function notExecuted(uint256 _index) private view {
         if (transactions[_index].isExecuted) {
-            revert();
+            revert ALREADY_EXECUTED();
         }
     }
 
@@ -76,7 +82,7 @@ contract MultiSigWallet {
         onlyOwnerAndTxExists(_index);
         notExecuted(_index);
         if (transactionIsConfirmed[_index][msg.sender]) {
-            revert();
+            revert ALREADY_CONFIRMED();
         }
 
         Transaction memory _transaction = transactions[_index];
@@ -94,7 +100,7 @@ contract MultiSigWallet {
             _transaction.data
         );
         if (!s) {
-            revert();
+            revert TRANSACTION_FAILED();
         }
         return s;
     }
@@ -104,7 +110,7 @@ contract MultiSigWallet {
         notExecuted(_index);
 
         if (!transactionIsConfirmed[_index][msg.sender]) {
-            revert();
+            revert ALREADY_REVOKED();
         }
         Transaction memory _transaction = transactions[_index];
         transactionIsConfirmed[_index][msg.sender] = false;
@@ -128,7 +134,7 @@ contract MultiSigWallet {
         uint256 _index
     ) external view returns (Transaction memory _tx) {
         if (_index >= transactions.length) {
-            revert();
+            revert INDEX_OUT_OF_BOUNDS();
         }
         _tx = transactions[_index];
     }
