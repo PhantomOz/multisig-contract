@@ -48,6 +48,21 @@ contract MultiSigWallet {
         numOfConfirmationRequired = _numOfConfirmationRequired;
     }
 
+    //Private functions as modifiers
+    function onlyOwnerAndTxExists(uint256 _index) private view {
+        if (!addressIsOwner[msg.sender]) {
+            revert();
+        }
+        if (_index >= transactions.length) {
+            revert();
+        }
+    }
+    function notExecuted(uint256 _index) private view {
+        if (transactions[_index].isExecuted) {
+            revert();
+        }
+    }
+
     //createTransaction
     function createTransaction(
         address _to,
@@ -58,10 +73,9 @@ contract MultiSigWallet {
     }
     //confirmTransaction
     function confirmTransaction(uint256 _index) external {
-        if (!addressIsOwner[msg.sender]) {
-            revert();
-        }
-        if (_index >= transactions.length) {
+        onlyOwnerAndTxExists(_index);
+        notExecuted(_index);
+        if (transactionIsConfirmed[_index][msg.sender]) {
             revert();
         }
 
@@ -71,12 +85,9 @@ contract MultiSigWallet {
     }
     //executeTransaction
     function executeTransaction(uint256 _index) external returns (bool) {
-        if (!addressIsOwner[msg.sender]) {
-            revert();
-        }
-        if (_index >= transactions.length) {
-            revert();
-        }
+        onlyOwnerAndTxExists(_index);
+        notExecuted(_index);
+
         Transaction memory _transaction = transactions[_index];
         _transaction.isExecuted = true;
         (bool s, ) = payable(_transaction.to).call{value: _transaction.value}(
@@ -89,12 +100,9 @@ contract MultiSigWallet {
     }
     //RevokeTransaction
     function revokeConfirmation(uint256 _index) external {
-        if (!addressIsOwner[msg.sender]) {
-            revert();
-        }
-        if (_index >= transactions.length) {
-            revert();
-        }
+        onlyOwnerAndTxExists(_index);
+        notExecuted(_index);
+
         if (!transactionIsConfirmed[_index][msg.sender]) {
             revert();
         }
