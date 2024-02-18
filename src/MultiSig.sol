@@ -88,4 +88,18 @@ contract MultiSigWallet {
         return s;
     }
     //RevokeTransaction
+    function revokeConfirmation(uint256 _index) external {
+        if (!addressIsOwner[msg.sender]) {
+            revert();
+        }
+        if (_index >= transactions.length) {
+            revert();
+        }
+        if (!transactionIsConfirmed[_index][msg.sender]) {
+            revert();
+        }
+        Transaction memory _transaction = transactions[_index];
+        transactionIsConfirmed[_index][msg.sender] = false;
+        _transaction.numOfConfirmation -= 1;
+    }
 }
