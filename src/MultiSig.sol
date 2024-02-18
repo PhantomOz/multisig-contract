@@ -19,7 +19,14 @@ contract MultiSigWallet {
     Transaction[] private transactions;
     mapping(uint256 => mapping(address => bool)) private transactionIsConfirmed;
 
-    event Deposit(address _from, uint256 _value);
+    event Deposit(address indexed _from, uint256 _value, uint256 _balance);
+    event CreateTransaction(
+        uint256 indexed _index,
+        address indexed _owner,
+        address indexed _to,
+        uint256 _value,
+        bytes _data
+    );
 
     struct Transaction {
         address to;
@@ -30,7 +37,7 @@ contract MultiSigWallet {
     }
 
     receive() external payable {
-        emit Deposit(msg.sender, msg.value);
+        emit Deposit(msg.sender, msg.value, address(this).balance);
     }
 
     constructor(address[] memory _owners, uint256 _numOfConfirmationRequired) {
@@ -81,7 +88,9 @@ contract MultiSigWallet {
         uint256 _value,
         bytes calldata _data
     ) external {
+        uint256 _index = transactions.length;
         transactions.push(Transaction(_to, _data, _value, false, 0));
+        emit CreateTransaction(_index, msg.sender, _to, _value, _data);
     }
     //confirmTransaction
     function confirmTransaction(uint256 _index) external {
