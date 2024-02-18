@@ -119,4 +119,17 @@ contract MultiSigWallet {
     {
         _trx = transactions;
     }
+
+    function getOwners() external view returns (address[] memory _owners) {
+        _owners = owners;
+    }
+
+    function getTransaction(
+        uint256 _index
+    ) external view returns (Transaction memory _tx) {
+        if (_index >= transactions.length) {
+            revert();
+        }
+        _tx = transactions[_index];
+    }
 }
