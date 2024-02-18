@@ -10,6 +10,7 @@ contract MultiSigWallet {
     address[] public owners;
     mapping(address => bool) public addressIsOwner;
     uint256 public numOfConfirmationRequired;
+    Transaction[] public transactions;
     mapping(uint256 => mapping(address => bool)) private transactionIsConfirmed;
 
     struct Transaction {
@@ -46,4 +47,16 @@ contract MultiSigWallet {
 
         numOfConfirmationRequired = _numOfConfirmationRequired;
     }
+
+    //createTransaction
+    function createTransaction(
+        address _to,
+        uint256 _value,
+        bytes calldata _data
+    ) external {
+        transactions.push(Transaction(_to, _data, _value, false, 0));
+    }
+    //confirmTransaction
+    //executeTransaction
+    //RevokeTransaction
 }
