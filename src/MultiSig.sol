@@ -7,10 +7,10 @@ error ADDRESS_CANT_BE_ZEROADDRESS();
 error ADDRESSES_ON_LIST_NOT_UNIQUE();
 
 contract MultiSigWallet {
-    address[] public owners;
-    mapping(address => bool) public addressIsOwner;
+    address[] private owners;
+    mapping(address => bool) private addressIsOwner;
     uint256 public numOfConfirmationRequired;
-    Transaction[] public transactions;
+    Transaction[] private transactions;
     mapping(uint256 => mapping(address => bool)) private transactionIsConfirmed;
 
     struct Transaction {
@@ -109,5 +109,14 @@ contract MultiSigWallet {
         Transaction memory _transaction = transactions[_index];
         transactionIsConfirmed[_index][msg.sender] = false;
         _transaction.numOfConfirmation -= 1;
+    }
+
+    //view functions
+    function getTransactions()
+        external
+        view
+        returns (Transaction[] memory _trx)
+    {
+        _trx = transactions;
     }
 }
