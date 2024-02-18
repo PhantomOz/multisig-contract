@@ -27,6 +27,8 @@ contract MultiSigWallet {
         uint256 numOfConfirmation;
     }
 
+    receive() external payable {}
+
     constructor(address[] memory _owners, uint256 _numOfConfirmationRequired) {
         if (_owners.length == 0) {
             revert OWNERSLIST_CANT_BE_EMPTY();
